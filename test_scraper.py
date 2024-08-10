@@ -8,6 +8,7 @@ def test_recent_matches(player_id):
             print(f"Recent matches for account {player_id}:")
             for match in matches:
                 print(f"Hero: {match['hero']}")
+                print(f"Role: {match['role']}")  # Include the parsed role
                 print(f"Result: {match['result']}")
                 print(f"Type: {match['type']}")
                 print(f"Duration: {match['duration']}")

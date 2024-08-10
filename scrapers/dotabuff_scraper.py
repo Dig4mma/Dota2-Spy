@@ -38,7 +38,7 @@ class DotabuffScraper(BaseScraper):
 
     def parse_recent_matches(self, soup):
         matches = []
-        match_elements = soup.select('section article table tbody tr')[:10]  # Select only the first 10 matches
+        match_elements = soup.select('section article table tbody tr')  # Select all matches
 
         for match in match_elements:
             match_data = {}
@@ -49,6 +49,7 @@ class DotabuffScraper(BaseScraper):
             kda_element = match.select_one('td:nth-child(7)')
             lobby_bracket_element = match.select_one('td:nth-child(2) div')
             date_element = match.select_one('td:nth-child(4) time')
+            role_element = match.select_one('td:nth-child(3).cell-centered.r-none-mobile')
 
             if hero_element:
                 match_data['hero'] = hero_element.text.strip()
@@ -86,6 +87,12 @@ class DotabuffScraper(BaseScraper):
             else:
                 match_data['date'] = 'Unknown'
 
+            if role_element:
+                role = self.parse_role(role_element)
+                match_data['role'] = role
+            else:
+                match_data['role'] = 'Unknown'
+
             matches.append(match_data)
 
         return matches
@@ -112,6 +119,25 @@ class DotabuffScraper(BaseScraper):
         else:
             minutes = diff.seconds // 60
             return f"{minutes} minute{'s' if minutes > 1 else ''} ago"
+
+    def parse_role(self, role_element):
+        icons = role_element.find_all('i')
+        roles = [icon.get('title', '') for icon in icons if 'title' in icon.attrs]
+
+        if 'Core Role' in roles:
+            if 'Safe Lane' in roles:
+                return 'Safe Lane'
+            elif 'Off Lane' in roles:
+                return 'Off Lane'
+            elif 'Mid Lane' in roles:
+                return 'Mid Lane'
+        elif 'Support Role' in roles:
+            if 'Safe Lane' in roles:
+                return 'Hard Support'
+            elif 'Off Lane' in roles:
+                return 'Support'
+
+        return 'Unknown'
 
     def parse_overview(self, soup):
         overview_data = {}
