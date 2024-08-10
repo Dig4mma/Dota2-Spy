@@ -9,7 +9,7 @@ Dota2 Spy is a Discord bot that provides real-time information and statistics fo
 
 ## Usage
 1. Create a new Discord bot and obtain the bot token.
-2. Rename `config.example.json` to `config.json` and replace `YOUR_BOT_TOKEN` with your actual bot token.
+2. Add your bot token to a .env file : `TOKEN = YOUR TOKEN`
 3. Run the bot: `python bot.py`
 
 ## Features

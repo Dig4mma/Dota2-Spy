@@ -30,6 +30,7 @@ class MatchCog(commands.Cog):
                 for match in matches:
                     response += (
                         f"Hero: {match['hero']}\n"
+                        f"Date: {match['date']}\n"
                         f"Result: {match['result']}\n"
                         f"Type: {match['type']}\n"
                         f"Duration: {match['duration']}\n"

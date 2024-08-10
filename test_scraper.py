@@ -11,6 +11,7 @@ def test_recent_matches(player_id):
                 print(f"Result: {match['result']}")
                 print(f"Type: {match['type']}")
                 print(f"Duration: {match['duration']}")
+                print(f"Date: {match['date']}")
                 print(f"KDA: {match['kda']}")
                 print(f"Lobby Bracket: {match['lobby_bracket']}")
                 print("-" * 20)

@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 from scrapers.base_scraper import BaseScraper
+from datetime import datetime
 
 class DotabuffScraper(BaseScraper):
     BASE_URL = 'https://www.dotabuff.com/players/'
@@ -47,6 +48,7 @@ class DotabuffScraper(BaseScraper):
             duration_element = match.select_one('td:nth-child(6)')
             kda_element = match.select_one('td:nth-child(7)')
             lobby_bracket_element = match.select_one('td:nth-child(2) div')
+            date_element = match.select_one('td:nth-child(4) time')
 
             if hero_element:
                 match_data['hero'] = hero_element.text.strip()
@@ -78,9 +80,38 @@ class DotabuffScraper(BaseScraper):
             else:
                 match_data['lobby_bracket'] = 'Unknown'
 
+            if date_element:
+                timestamp = date_element['datetime']
+                match_data['date'] = self.calculate_time_difference(timestamp)
+            else:
+                match_data['date'] = 'Unknown'
+
             matches.append(match_data)
 
         return matches
+
+    def calculate_time_difference(self, timestamp):
+        match_time = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
+        now = datetime.now(match_time.tzinfo)
+        diff = now - match_time
+
+        if diff.days >= 365:
+            years = diff.days // 365
+            return f"{years} year{'s' if years > 1 else ''} ago"
+        elif diff.days >= 30:
+            months = diff.days // 30
+            return f"{months} month{'s' if months > 1 else ''} ago"
+        elif diff.days >= 7:
+            weeks = diff.days // 7
+            return f"{weeks} week{'s' if weeks > 1 else ''} ago"
+        elif diff.days >= 1:
+            return f"{diff.days} day{'s' if diff.days > 1 else ''} ago"
+        elif diff.seconds >= 3600:
+            hours = diff.seconds // 3600
+            return f"{hours} hour{'s' if hours > 1 else ''} ago"
+        else:
+            minutes = diff.seconds // 60
+            return f"{minutes} minute{'s' if minutes > 1 else ''} ago"
 
     def parse_overview(self, soup):
         overview_data = {}

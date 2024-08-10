@@ -1,5 +1,3 @@
-# scrapers/base_scraper.py
-
 from abc import ABC, abstractmethod
 
 class BaseScraper(ABC):
