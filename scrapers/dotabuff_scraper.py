@@ -160,4 +160,11 @@ class DotabuffScraper(BaseScraper):
         else:
             overview_data['rank'] = 'Unknown'
         
+        # Extract profile image URL
+        profile_image_element = soup.select_one('img.image-player.image-bigavatar')
+        if profile_image_element and 'src' in profile_image_element.attrs:
+            overview_data['profile_image'] = profile_image_element['src']
+        else:
+            overview_data['profile_image'] = 'Unknown'
+        
         return overview_data
