@@ -1,2 +1,1 @@
-from .main_view import MainView
-from .modal_view import PlayerProfile
+from .player_view import PlayerView

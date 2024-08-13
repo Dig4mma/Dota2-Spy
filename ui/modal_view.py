@@ -45,12 +45,10 @@ class PlayerProfile(Modal):
                 await interaction.response.send_message(f"Error: Number of recent matches must be an integer.", ephemeral=True)
                 return
 
-            # Call the match_cog function and use followup to send the response
-            response = await self.match_cog.recent_matches(interaction, player_id, num_matches)
-            logger.debug(f"Received response from recent_matches: {response}")
+            # Call the match_cog function, which will handle sending the response
+            await self.match_cog.recent_matches(interaction, player_id, num_matches)
+            logger.debug(f"Received response from recent_matches")
 
-            await interaction.followup.send(response)  # Send the response using followup
-            logger.debug("Response sent")
         except Exception as e:
             logger.error(f"Error in PlayerProfile on_submit for custom_id {self.custom_id}: {str(e)}")
             if not interaction.response.is_done():

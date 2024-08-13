@@ -1,21 +1,22 @@
+# ui/main_view.py
 import discord
 import logging
 import os
 from discord.ui import View, Select, Button
+from cogs.match_cog import MatchCog
 from ui.modal_view import PlayerProfile
-from cogs.match_cog import MatchCog  # Import MatchCog
+
 
 logger = logging.getLogger(__name__)
 
 class MainView(View):
-    def __init__(self, match_cog: MatchCog):
+    def __init__(self, match_cog: 'MatchCog'):
         super().__init__()
         self.match_cog = match_cog  # Store a reference to the match cog
         self.selected_option = None  # Initialize an instance variable to store the selected option
         
         options = [
             discord.SelectOption(label="Player Profile", value="Player Profile", description="Search for a player's profile"),
-            discord.SelectOption(label="Option 2", value="option_2", description="Description for option 2"),
         ]
         
         select = Select(
@@ -43,6 +44,7 @@ class MainView(View):
             logger.debug(f"Button clicked with selected option: {self.selected_option}")
             if self.selected_option == "Player Profile":
                 custom_id = os.urandom(16).hex()  # Generate a unique custom_id for the modal
+                from ui.modal_view import PlayerProfile
                 await interaction.response.send_modal(PlayerProfile(self.match_cog, custom_id=custom_id))
                 logger.debug(f"Sent PlayerProfile modal with custom_id: {custom_id}")
             else:

@@ -167,4 +167,11 @@ class DotabuffScraper(BaseScraper):
         else:
             overview_data['profile_image'] = 'Unknown'
         
+        # Extract rank image URL
+        rank_image_element = soup.select_one('img.rank-tier-base')
+        if rank_image_element and 'src' in rank_image_element.attrs:
+            overview_data['rank_image'] = rank_image_element['src']
+        else:
+            overview_data['rank_image'] = 'Unknown'
+        
         return overview_data
