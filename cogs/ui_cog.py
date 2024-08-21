@@ -19,7 +19,7 @@ class UICog(commands.Cog):
         embed = discord.Embed(
             title="Welcome to Dota 2 Analysis Bot",
             description="Analyze your recent Dota 2 matches, view player stats, and get detailed insights into your gameplay. Click the button below to start the analysis.",
-            color=discord.Color.blue()
+            color=discord.Color.green()
         )
         embed.set_author(name="Dota 2 Spy", icon_url="attachment://author_icon.png")
         embed.set_image(url="attachment://gif.gif")
@@ -28,7 +28,7 @@ class UICog(commands.Cog):
         file2 = discord.File("assets/gif.gif", filename="gif.gif")
 
         logger.debug("Creating MainView instance with MatchCog")
-        view = MainView(match_cog=self.bot.get_cog('MatchCog'))  # Pass the MatchCog instance
+        view = MainView(match_cog=self.bot.get_cog('MatchCog'))
         logger.debug("MainView instance created")
 
         try:

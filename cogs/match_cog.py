@@ -29,21 +29,27 @@ class MatchCog(commands.Cog):
     async def recent_matches(self, interaction: discord.Interaction, player_id: str, num_matches: int = 5):
         await interaction.response.defer()  # Acknowledge the command and show loading state
 
-        scraper = DotabuffScraper(player_id)
+        embeds = []
+        buttons = None  # Initialize buttons to None at the start
+
         try:
+            scraper = DotabuffScraper(player_id)
             overview = scraper.get_data('overview')
             matches = scraper.get_data('recent_matches')[:num_matches]  # Limit the number of matches
 
+            if not overview or not matches:
+                raise ValueError("Player does not exist")
+
             player_view = PlayerView(player_data=overview, matches=matches, match_cog=self)  # Create an instance of PlayerView
             embeds = player_view.create_embeds()  # Create the embeds
+            buttons = player_view.create_buttons()  # Create the buttons
 
         except Exception as e:
             logger.error(f"Exception occurred: {str(e)}")
             embeds = [discord.Embed(title="Error", description=str(e), color=discord.Color.red())]
 
         for i, embed in enumerate(embeds):
-            if i == len(embeds) - 1:  # Last embed, add buttons
-                buttons = player_view.create_buttons()
+            if i == len(embeds) - 1 and buttons:  # Last embed, add buttons if available
                 await interaction.followup.send(embed=embed, view=buttons, ephemeral=True)
             else:
                 await interaction.followup.send(embed=embed, ephemeral=True)
@@ -62,7 +68,7 @@ class MatchCog(commands.Cog):
                 embed = discord.Embed(
                     title="Welcome to Dota 2 Analysis Bot",
                     description="Analyze your recent Dota 2 matches, view player stats, and get detailed insights into your gameplay. Click the button below to start the analysis.",
-                    color=discord.Color.blue()
+                    color=discord.Color.green()
                 )
                 embed.set_image(url="https://cdn.discordapp.com/attachments/1081285481171538063/1272574461291397210/gif.gif")
                 embed.set_author(name="Dota 2 Spy", icon_url="https://cdn.discordapp.com/attachments/1081285481171538063/1272574460943405180/author_icon.png")

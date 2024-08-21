@@ -53,8 +53,12 @@ class DotabuffScraper(BaseScraper):
 
             if hero_element:
                 match_data['hero'] = hero_element.text.strip()
+                href = hero_element.get('href', '')
+                if href:
+                    match_data['match_id'] = href.split('/')[-1]  # Extract the match ID from the href
             else:
                 match_data['hero'] = 'Unknown'
+                match_data['match_id'] = 'Unknown'
 
             if result_element:
                 match_data['result'] = result_element.text.replace(' Match', '').strip()

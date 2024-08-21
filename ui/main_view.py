@@ -6,7 +6,6 @@ from discord.ui import View, Select, Button
 from cogs.match_cog import MatchCog
 from ui.modal_view import PlayerProfile
 
-
 logger = logging.getLogger(__name__)
 
 class MainView(View):
@@ -17,6 +16,7 @@ class MainView(View):
         
         options = [
             discord.SelectOption(label="Player Profile", value="Player Profile", description="Search for a player's profile"),
+            discord.SelectOption(label="Find a match", value="Find a match", description="Search for a specific match"),
         ]
         
         select = Select(
@@ -38,7 +38,7 @@ class MainView(View):
         except Exception as e:
             logger.error(f"Error in select_callback: {str(e)}")
 
-    @discord.ui.button(label="Start Analysis", style=discord.ButtonStyle.primary, custom_id="start_analysis_button", row=1)
+    @discord.ui.button(label="Start Analysis", style=discord.ButtonStyle.success, custom_id="start_analysis_button", row=1)
     async def button_callback(self, interaction: discord.Interaction, button: discord.ui.Button):
         try:
             logger.debug(f"Button clicked with selected option: {self.selected_option}")
@@ -47,6 +47,9 @@ class MainView(View):
                 from ui.modal_view import PlayerProfile
                 await interaction.response.send_modal(PlayerProfile(self.match_cog, custom_id=custom_id))
                 logger.debug(f"Sent PlayerProfile modal with custom_id: {custom_id}")
+            elif self.selected_option == "Find a match":
+                # Add logic to handle "Find a match" option
+                await interaction.response.send_message("Find a match option selected.", ephemeral=True)
             else:
                 await interaction.response.send_message("Please select an option first.", ephemeral=True)
         except Exception as e:

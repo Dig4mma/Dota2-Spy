@@ -52,8 +52,10 @@ class PlayerView:
                 else:
                     result_text = f"```diff\n- {match['result']}\n```"
 
+                match_id = match.get('match_id', 'Unknown')
+
                 current_embed.add_field(name=match['hero'], value=match['role'], inline=True)
-                current_embed.add_field(name="Result", value=result_text, inline=True)
+                current_embed.add_field(name=match_id, value=result_text, inline=True)
                 current_embed.add_field(name=match['duration'], value=match['date'], inline=True)
 
             embeds.append(current_embed)
