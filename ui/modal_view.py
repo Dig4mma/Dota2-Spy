@@ -1,8 +1,8 @@
 import discord
 from discord.ui import Modal, TextInput
-from typing import TYPE_CHECKING
 import logging
 import os
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from cogs.match_cog import MatchCog
@@ -65,3 +65,44 @@ class PlayerProfile(Modal):
 
     async def on_timeout(self) -> None:
         logger.warning(f"PlayerProfile modal interaction timed out for custom_id {self.custom_id}.")
+
+
+class MatchModal(Modal):
+    def __init__(self, match_cog: 'MatchCog', *args, **kwargs) -> None:
+        custom_id = kwargs.pop('custom_id', os.urandom(16).hex())
+        super().__init__(title="Search for a Match", custom_id=custom_id, *args, **kwargs)
+        self.match_cog = match_cog
+
+        self.add_item(TextInput(
+            label="Match ID", 
+            placeholder="example: 7897159898", 
+            required=True,
+            custom_id="match_id"
+        ))
+
+    async def on_submit(self, interaction: discord.Interaction):
+        logger.debug(f"Entered MatchModal on_submit for custom_id: {self.custom_id}")
+        try:
+            match_id = self.children[0].value
+            logger.debug(f"Extracted Match ID: {match_id}")
+
+            # Call the match_cog function to handle the match search
+            await self.match_cog.find_match(interaction, match_id)
+            logger.debug(f"Match data request sent for Match ID: {match_id}")
+
+        except Exception as e:
+            logger.error(f"Error in MatchModal on_submit for custom_id {self.custom_id}: {str(e)}")
+            if not interaction.response.is_done():
+                await interaction.response.send_message(f"Error: {str(e)}", ephemeral=True)
+            else:
+                await interaction.followup.send(f"Error: {str(e)}", ephemeral=True)
+
+    async def on_error(self, interaction: discord.Interaction, error: Exception) -> None:
+        logger.error(f"Error in MatchModal modal for custom_id {self.custom_id}: {str(error)}")
+        if not interaction.response.is_done():
+            await interaction.response.send_message("An error occurred while processing your request.", ephemeral=True)
+        else:
+            await interaction.followup.send("An error occurred while processing your request.", ephemeral=True)
+
+    async def on_timeout(self) -> None:
+        logger.warning(f"MatchModal modal interaction timed out for custom_id {self.custom_id}.")

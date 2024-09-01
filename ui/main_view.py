@@ -1,4 +1,3 @@
-# ui/main_view.py
 import discord
 import logging
 import os
@@ -48,8 +47,10 @@ class MainView(View):
                 await interaction.response.send_modal(PlayerProfile(self.match_cog, custom_id=custom_id))
                 logger.debug(f"Sent PlayerProfile modal with custom_id: {custom_id}")
             elif self.selected_option == "Find a match":
-                # Add logic to handle "Find a match" option
-                await interaction.response.send_message("Find a match option selected.", ephemeral=True)
+                from ui.modal_view import MatchModal  # Import here to avoid circular dependency
+                custom_id = os.urandom(16).hex()  # Generate a unique custom_id for the modal
+                await interaction.response.send_modal(MatchModal(self.match_cog, custom_id=custom_id))
+                logger.debug(f"Sent MatchModal modal with custom_id: {custom_id}")
             else:
                 await interaction.response.send_message("Please select an option first.", ephemeral=True)
         except Exception as e:
