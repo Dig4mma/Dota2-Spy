@@ -75,20 +75,47 @@ class MatchCog(commands.Cog):
                 await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
     async def find_match(self, interaction: discord.Interaction, match_id: str):
-        await interaction.response.defer()
+        await interaction.response.defer()  # Acknowledge the command and show loading state
+
         try:
             match_data = self.stratz_api.get_match_data(match_id)
+
             if not match_data:
                 raise ValueError("Match does not exist")
 
-            embeds = [discord.Embed(title=f"Match {match_id}", description="Match data fetched successfully.")]
+            # Process match_data and create a detailed embed
+            match_info = match_data.get('data', {}).get('match', {})
+            did_radiant_win = match_info.get('didRadiantWin', False)
+            duration = match_info.get('durationSeconds', 0)
+            lobby_type = match_info.get('lobbyType', 'Unknown')
+            rank = match_info.get('rank', 'Unknown')
+            bracket = match_info.get('bracket', 'Unknown')
+
+            result = "Radiant Win" if did_radiant_win else "Dire Win"
+            duration_minutes = duration // 60
+
+            embed = discord.Embed(
+                title=f"Match {match_id}",
+                description=f"Result: {result}\nDuration: {duration_minutes} minutes\nLobby Type: {lobby_type}\nRank: {rank}\nBracket: {bracket}",
+                color=discord.Color.green() if did_radiant_win else discord.Color.red()
+            )
+
+            # Add player details to the embed
+            for player in match_info.get('players', []):
+                player_name = player.get('steamAccount', {}).get('name', 'Unknown Player')
+                hero_name = player.get('hero', {}).get('displayName', 'Unknown Hero')
+                kills = player.get('kills', 0)
+                deaths = player.get('deaths', 0)
+                assists = player.get('assists', 0)
+                kda = f"{kills}/{deaths}/{assists}"
+
+                embed.add_field(name=f"{player_name} ({hero_name})", value=f"KDA: {kda}", inline=False)
+
         except Exception as e:
             logger.error(f"Exception occurred: {str(e)}")
-            embeds = [discord.Embed(title="Error", description=str(e), color=discord.Color.red())]
+            embed = discord.Embed(title="Error", description=str(e), color=discord.Color.red())
 
-        for embed in embeds:
-            await interaction.followup.send(embed=embed, ephemeral=True)
-
+        await interaction.followup.send(embed=embed, ephemeral=True)
         logger.debug("Match data sent successfully")
 
 
