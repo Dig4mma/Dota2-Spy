@@ -7,5 +7,8 @@ idna==3.7
 multidict==6.0.5
 py-cord==2.6.0
 py-dotenv==0.1
-python-dotenv==1.0.1
+python-dotenv~=0.21.0
 yarl==1.9.4
+
+requests~=2.32.3
+beautifulsoup4~=4.12.3
